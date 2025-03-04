@@ -30,21 +30,8 @@ export_env_dir() {
 
 cd $BUILD_DIR
 
-# Set the web root to the build/ directory
-# if [ -f "static.json" ]
-# then
-#   echo '       Using existing `static.json`'
-# else
-#   echo '       Writing `static.json` to support create-react-app'
-#   cat << EOF > static.json
-# {
-#   "root": "build/",
-#   "routes": {
-#     "/**": "index.html"
-#   }
-# }
-# EOF
-# fi
+
+echo "=====> Using Bonobo's create-react-app-inner-buildpack"
 
 echo '       Enabling runtime environment variables'
 
