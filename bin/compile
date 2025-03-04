@@ -42,3 +42,8 @@ cp "$BP_DIR/lib/injectable_env.js" "$cra_dir/"
 profile_d_dir="$BUILD_DIR/.profile.d"
 mkdir -p "$profile_d_dir"
 cp "$BP_DIR/.profile.d/inject_react_app_env.sh" "$profile_d_dir/"
+
+
+echo '       Generating nginx config'
+export BUILD_DIR
+./create_nginx_config.sh
