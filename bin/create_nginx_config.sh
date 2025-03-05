@@ -19,7 +19,7 @@ fi
 set -e
 
 echo "Installing EJS dependency..."
-/app/.heroku/node/bin/npm install ejs
+npm install ejs
 
 echo "Running generate-config.js to generate nginx-static.conf.erb..."
 /app/.heroku/node/bin/node generate_config.js "$BUILD_DIR/static.json"
