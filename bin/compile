@@ -46,4 +46,4 @@ cp "$BP_DIR/.profile.d/inject_react_app_env.sh" "$profile_d_dir/"
 
 echo '       Generating nginx config'
 export BUILD_DIR
-./create_nginx_config.sh
+source "$BP_DIR/bin/create_nginx_config.sh"
