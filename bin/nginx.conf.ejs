@@ -65,6 +65,8 @@ http {
     location ~ <%= pattern %> {
       try_files $uri <%= target %>;
     }
+    
+    <% }); %>
  
     <% /* Generate header locations */ %>
     <% Object.keys(config.headers).forEach(function(loc) { %>
