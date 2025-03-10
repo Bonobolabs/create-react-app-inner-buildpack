@@ -49,18 +49,23 @@ http {
 
     <% /* Generate route locations */ %>
     <% Object.keys(config.routes).forEach(function(route) {
-         var target = config.routes[route]; %>
-    <% if (route.indexOf('*') !== -1) { %>
-    location ~ <%= '^' + route.replace(/\*\*/g, '.*').replace(/\*/g, '[^/]*') + '$' %> {
+      var target = config.routes[route];
+      // Ensure target starts with a slash.
+      if (target.charAt(0) !== '/') {
+        target = '/' + target;
+      }
+      // Create a regex pattern from the route.
+      var pattern;
+      if (route === "/") {
+        pattern = "^/$";
+      } else {
+        pattern = "^" + route.replace(/\*\*/g, ".*").replace(/\*/g, "[^/]*") + "$";
+      }
+    %>
+    location ~ <%= pattern %> {
       try_files $uri <%= target %>;
     }
-    <% } else { %>
-    location <%= route %> {
-      try_files $uri <%= target %>;
-    }
-    <% } %>
-    <% }); %>
-
+ 
     <% /* Generate header locations */ %>
     <% Object.keys(config.headers).forEach(function(loc) { %>
     location <%= loc %> {
