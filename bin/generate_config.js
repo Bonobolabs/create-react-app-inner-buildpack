@@ -6,17 +6,6 @@ const ejs = require('ejs')
 const configPath = process.argv[2] || path.join(__dirname, '..', 'static.json')
 const config = JSON.parse(fs.readFileSync(configPath, 'utf8'))
 
-if (config.proxies) {
-  Object.keys(config.proxies).forEach((proxyPath) => {
-    let origin = config.proxies[proxyPath].origin
-    // Use regex to substitute placeholders with values from process.env.
-    origin = origin.replace(/\$\{([^}]+)\}/g, (match, varName) => {
-      return process.env[varName] || match
-    })
-    config.proxies[proxyPath].origin = origin
-  })
-}
-
 // Load the EJS template.
 const templatePath = path.join(__dirname, 'nginx.conf.ejs')
 const template = fs.readFileSync(templatePath, 'utf8')
