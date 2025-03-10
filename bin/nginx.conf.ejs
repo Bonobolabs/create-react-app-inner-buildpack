@@ -67,15 +67,28 @@ http {
     }
     
     <% }); %>
- 
+      
     <% /* Generate header locations */ %>
-    <% Object.keys(config.headers).forEach(function(loc) { %>
-    location <%= loc %> {
+      <% Object.keys(config.headers).forEach(function(loc) {
+          let pattern;
+          if (loc.indexOf('*') !== -1) {
+            // Convert wildcards:
+            // "**" becomes ".*" and "*" becomes "[^/]*"
+            pattern = "^" + loc.replace(/\*\*/g, ".*").replace(/\*/g, "[^/]*") + "$";
+      %>
+      location ~ <%= pattern %> {
       <% Object.keys(config.headers[loc]).forEach(function(header) { %>
         add_header <%- header %> "<%- config.headers[loc][header] %>" always;
       <% }); %>
-    }
-    <% }); %>
+      }
+      <%   } else { %>
+      location <%= loc %> {
+      <% Object.keys(config.headers[loc]).forEach(function(header) { %>
+        add_header <%- header %> "<%- config.headers[loc][header] %>" always;
+      <% }); %>
+      }
+      <%   } 
+    }); %>
 
     <% /* Generate proxy locations */ %>
     <% let proxyIndex = 0; %>
