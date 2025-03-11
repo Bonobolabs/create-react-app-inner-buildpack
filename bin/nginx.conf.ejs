@@ -50,7 +50,7 @@ http {
     <% /* Apply common headers at the top level */ %>
     <% if (config.headers && config.headers.common) { %>
       <% Object.keys(config.headers.common).forEach(function(header) { %>
-        more_set_headers <%- header %> "<%- config.headers.common[header] %>" always;
+        more_set_headers "<%- header %>: <%- config.headers.common[header] %>" always;
       <% }); %>
     <% } %>
 
@@ -73,7 +73,7 @@ http {
       try_files $uri <%= target %>;
       <% if (config.headers["/**"]) { %>
         <% Object.keys(config.headers["/**"]).forEach(function(header) { %>
-          more_set_headers <%- header %> "<%- config.headers["/**"][header] %>" always;
+        more_set_headers "<%- header %>: <%- config.headers['/**'][header] %>" always;
         <% }); %>
       <% } %>
     }
@@ -96,13 +96,13 @@ http {
     %>
     location ~ <%= pattern %> {
       <% Object.keys(config.headers[loc]).forEach(function(header) { %>
-        more_set_headers <%- header %> "<%- config.headers[loc][header] %>" always;
+        more_set_headers "<%- header %>: <%- config.headers[loc][header] %>" always;
       <% }); %>
     }
     <%   } else { %>
     location <%= loc %> {
       <% Object.keys(config.headers[loc]).forEach(function(header) { %>
-        more_set_headers <%- header %> "<%- config.headers[loc][header] %>" always;
+        more_set_headers "<%- header %>: <%- config.headers[loc][header] %>" always;
       <% }); %>
     }
     <%   }
@@ -125,7 +125,7 @@ http {
           if (headerKey.indexOf(proxyPath) === 0) {
             Object.keys(config.headers[headerKey]).forEach(function(header) {
       %>
-      more_set_headers <%- header %> "<%- config.headers[headerKey][header] %>" always;
+        more_set_headers "<%- header %>: <%- config.headers[headerKey][header] %>" always;
       <%
             });
           }
