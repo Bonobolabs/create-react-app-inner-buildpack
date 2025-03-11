@@ -79,6 +79,10 @@ http {
     }
 
     <% }); %>
+    <%
+      // Build an array of proxy keys.
+      let proxyKeys = Object.keys(config.proxies);
+    %>
 
     <% /* Generate header locations for routes with specific headers, excluding "common" */ %>
       <% Object.keys(config.headers).forEach(function(loc) {
