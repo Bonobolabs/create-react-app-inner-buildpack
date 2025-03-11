@@ -47,6 +47,13 @@ http {
     ## Document root
     root <%= config.root %>;
 
+    <% /* Apply common headers at the top level */ %>
+    <% if (config.headers && config.headers.common) { %>
+      <% Object.keys(config.headers.common).forEach(function(header) { %>
+        more_set_headers <%- header %> "<%- config.headers.common[header] %>" always;
+      <% }); %>
+    <% } %>
+
     <% /* Generate route locations */ %>
     <% Object.keys(config.routes).forEach(function(route) {
       var target = config.routes[route];
@@ -64,41 +71,62 @@ http {
     %>
     location ~ <%= pattern %> {
       try_files $uri <%= target %>;
+      <% if (config.headers["/**"]) { %>
+        <% Object.keys(config.headers["/**"]).forEach(function(header) { %>
+          more_set_headers <%- header %> "<%- config.headers["/**"][header] %>" always;
+        <% }); %>
+      <% } %>
     }
-    
+
     <% }); %>
-      
-    <% /* Generate header locations */ %>
+
+    <% /* Generate header locations for routes with specific headers, excluding "common" */ %>
       <% Object.keys(config.headers).forEach(function(loc) {
-          let pattern;
-          if (loc.indexOf('*') !== -1) {
-            // Convert wildcards:
-            // "**" becomes ".*" and "*" becomes "[^/]*"
-            pattern = "^" + loc.replace(/\*\*/g, ".*").replace(/\*/g, "[^/]*") + "$";
-      %>
-      location ~ <%= pattern %> {
+      if (loc === "common") return;  // Skip common headers (applied globally)
+      // Check if this header location is already handled by a proxy.
+      let skip = proxyKeys.some(proxyKey => loc.indexOf(proxyKey) === 0);
+      if (skip) return;
+      let pattern;
+      if (loc.indexOf('*') !== -1) {
+        pattern = "^" + loc.replace(/\*\*/g, ".*").replace(/\*/g, "[^/]*") + "$";
+    %>
+    location ~ <%= pattern %> {
       <% Object.keys(config.headers[loc]).forEach(function(header) { %>
         more_set_headers <%- header %> "<%- config.headers[loc][header] %>" always;
       <% }); %>
-      }
-      <%   } else { %>
-      location <%= loc %> {
+    }
+    <%   } else { %>
+    location <%= loc %> {
       <% Object.keys(config.headers[loc]).forEach(function(header) { %>
         more_set_headers <%- header %> "<%- config.headers[loc][header] %>" always;
       <% }); %>
-      }
-      <%   } 
+    }
+    <%   }
     }); %>
 
-    <% /* Generate proxy locations */ %>
+    <% /* Generate proxy locations with header overrides */ %>
     <% let proxyIndex = 0; %>
     <% Object.keys(config.proxies).forEach(function(proxyPath) {
-         let origin = config.proxies[proxyPath].origin; %>
+        let origin = config.proxies[proxyPath].origin;
+    %>
     set $upstream_endpoint_<%= proxyIndex %> <%- origin %>;
     location @proxy_<%= proxyIndex %> {
       rewrite ^<%= proxyPath.replace(/\//g, '\\/') %>\\/?(.*)$ /$1 break;
       proxy_pass $upstream_endpoint_<%= proxyIndex %>;
       proxy_ssl_server_name on;
+      <%
+        // Iterate over header rules and check if the header location key applies to this proxy.
+        Object.keys(config.headers).forEach(function(headerKey) {
+          // If the headerKey (like "/__/auth/**") starts with the proxyPath ("/__/auth"), apply its headers.
+          if (headerKey.indexOf(proxyPath) === 0) {
+            Object.keys(config.headers[headerKey]).forEach(function(header) {
+      %>
+      more_set_headers <%- header %> "<%- config.headers[headerKey][header] %>" always;
+      <%
+            });
+          }
+        });
+      %>
     }
     <% proxyIndex++; }); %>
 
