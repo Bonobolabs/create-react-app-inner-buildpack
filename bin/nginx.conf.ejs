@@ -115,7 +115,7 @@ http {
     %>
     set $upstream_endpoint_<%= proxyIndex %> <%- origin %>;
     location @proxy_<%= proxyIndex %> {
-      rewrite ^<%= proxyPath.replace(/\//g, '\\/') %>\\/?(.*)$ /$1 break;
+      rewrite ^<%= proxyPath %>/?(.*)$ /$1 break;
       proxy_pass $upstream_endpoint_<%= proxyIndex %>;
       proxy_ssl_server_name on;
       <%
