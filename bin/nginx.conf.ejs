@@ -78,13 +78,13 @@ http {
       %>
       location ~ <%= pattern %> {
       <% Object.keys(config.headers[loc]).forEach(function(header) { %>
-        add_header <%- header %> "<%- config.headers[loc][header] %>" always;
+        more_set_headers <%- header %> "<%- config.headers[loc][header] %>" always;
       <% }); %>
       }
       <%   } else { %>
       location <%= loc %> {
       <% Object.keys(config.headers[loc]).forEach(function(header) { %>
-        add_header <%- header %> "<%- config.headers[loc][header] %>" always;
+        more_set_headers <%- header %> "<%- config.headers[loc][header] %>" always;
       <% }); %>
       }
       <%   } 
