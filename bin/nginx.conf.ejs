@@ -119,7 +119,7 @@ http {
     set $upstream_endpoint_<%= proxyIndex %> <%- origin %>;
 
     location <%= proxyPath %> {
-      rewrite ^<%= proxyPath %>/?(.*)$ /$1 break;
+      rewrite ^<%= proxyPath %>/?(.*)$ <%= proxyPath %>/$1 break;
       proxy_pass $upstream_endpoint_<%= proxyIndex %>;
       proxy_ssl_server_name on;
       proxy_redirect <%- origin %>/ <%- proxyPath %>;
