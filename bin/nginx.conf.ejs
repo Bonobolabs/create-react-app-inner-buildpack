@@ -118,33 +118,24 @@ http {
     # Define the upstream endpoint for proxy <%= proxyIndex %>
     set $upstream_endpoint_<%= proxyIndex %> <%- origin %>;
 
-    # Front-facing proxy location for <%= proxyPath %>
     location <%= proxyPath %> {
-      try_files $uri @proxy_<%= proxyIndex %>;
-    }
-
-    # Named proxy location that performs URI rewrite and proxy pass.
-    location @proxy_<%= proxyIndex %> {
       rewrite ^<%= proxyPath %>/?(.*)$ /$1 break;
       proxy_pass $upstream_endpoint_<%= proxyIndex %>;
       proxy_ssl_server_name on;
+      proxy_redirect <%- origin %>/ <%- proxyPath %>;
 
-      <%
-        // For each header defined whose key starts with this proxyPath, add them.
-        Object.keys(config.headers).forEach(function(headerKey) {
-          if (headerKey.indexOf(proxyPath) === 0) {
-            Object.keys(config.headers[headerKey]).forEach(function(header) {
+      <% /* Add any headers defined for this proxy (matching keys starting with proxyPath) */ %>
+      <% Object.keys(config.headers).forEach(function(headerKey) {
+            if (headerKey.indexOf(proxyPath) === 0) {
+                Object.keys(config.headers[headerKey]).forEach(function(header) {
       %>
       more_set_headers "<%- header %>: <%- config.headers[headerKey][header] %>" always;
-      <%
-            });
-          }
-        });
-      %>
+      <%             });
+            }
+      }); %>
     }
 
     <% proxyIndex++; }); %>
-
     location @404 {
       return 404;
     }
