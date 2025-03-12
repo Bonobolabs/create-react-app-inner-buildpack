@@ -44,6 +44,8 @@ http {
       return 301 https://$host$request_uri;
     }
 
+    resolver 10.1.0.2 8.8.8.8;
+
     ## Document root
     root <%= config.root %>;
 
