@@ -45,6 +45,7 @@ http {
     }
 
     resolver 10.1.0.2 8.8.8.8;
+    proxy_bind 0.0.0.0;
 
     ## Document root
     root <%= config.root %>;
