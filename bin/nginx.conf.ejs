@@ -45,7 +45,6 @@ http {
     }
 
     resolver 10.1.0.2 8.8.8.8;
-    proxy_bind 0.0.0.0;
 
     ## Document root
     root <%= config.root %>;
@@ -111,32 +110,28 @@ http {
     <%   }
     }); %>
 
-    <% /* Generate proxy locations with a front-facing location block */ %>
-    <% let proxyIndex = 0; %>
+    <% /* Generate simplified proxy locations that directly proxy requests */ %>
     <% Object.keys(config.proxies).forEach(function(proxyPath) {
+        // Assume proxyPath (e.g. "/__/auth/") already has a trailing slash.
         let origin = config.proxies[proxyPath].origin;
     %>
-    # Define the upstream endpoint for proxy <%= proxyIndex %>
-    set $upstream_endpoint_<%= proxyIndex %> <%- origin %>;
-
     location <%= proxyPath %> {
-      rewrite ^<%= proxyPath %>/?(.*)$ <%= proxyPath %>/$1 break;
-      proxy_pass $upstream_endpoint_<%= proxyIndex %>;
+      proxy_pass <%- origin %>;
       proxy_ssl_server_name on;
-      proxy_redirect <%- origin %>/ <%- proxyPath %>;
+      proxy_redirect <%- origin %>/ <%= proxyPath %>;
 
-      <% /* Add any headers defined for this proxy (matching keys starting with proxyPath) */ %>
+      <% /* Inject headers defined for this proxy (e.g. keys like "/__/auth/**") */ %>
       <% Object.keys(config.headers).forEach(function(headerKey) {
-            if (headerKey.indexOf(proxyPath) === 0) {
-                Object.keys(config.headers[headerKey]).forEach(function(header) {
+          if (headerKey.indexOf(proxyPath) === 0) {
+            Object.keys(config.headers[headerKey]).forEach(function(header) {
       %>
       more_set_headers "<%- header %>: <%- config.headers[headerKey][header] %>" always;
-      <%             });
-            }
+      <%         });
+          }
       }); %>
     }
+    <% }); %>
 
-    <% proxyIndex++; }); %>
     location @404 {
       return 404;
     }
