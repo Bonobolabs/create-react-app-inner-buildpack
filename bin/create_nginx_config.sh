@@ -20,6 +20,6 @@ npm install ejs
 
 echo "Running generate-config.js to generate nginx-static.conf.erb..."
 mkdir -p "$BUILD_DIR/config"
-node "$BP_DIR/bin/generate_config.js" "$BUILD_DIR/static.json" >  "$BUILD_DIR/config/nginx.conf.erb"
+node "$BP_DIR/bin/generate_config.cjs" "$BUILD_DIR/static.json" >  "$BUILD_DIR/config/nginx.conf.erb"
 
 echo "nginx-static.conf.erb generated successfully."
