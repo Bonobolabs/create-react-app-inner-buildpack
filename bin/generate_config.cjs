@@ -21,6 +21,16 @@ function normalizePath(p) {
   return norm === '' ? '/' : norm
 }
 
+function routeToRegex(route) {
+  // Replace all double asterisks with a placeholder.
+  let temp = route.replace(/\*\*/g, '<<<DOUBLE>>>')
+  // Replace any single asterisks with the regex to match any characters except a slash.
+  temp = temp.replace(/\*/g, '[^/]*')
+  // Replace the placeholder with the regex to match any characters.
+  temp = temp.replace(/<<<DOUBLE>>>/g, '.*')
+  return '^' + temp + '$'
+}
+
 /**
  * Merge headers for a given route from headersConfig.
  * It will merge any header entry (except "common" and "/**")
@@ -56,8 +66,7 @@ Object.keys(config.routes).forEach((routeKey) => {
   if (routeKey === '/') {
     pattern = '^/$'
   } else {
-    pattern =
-      '^' + routeKey.replace(/\*\*/g, '.*').replace(/\*/g, '[^/]*') + '$'
+    pattern = routeToRegex(routeKey)
   }
 
   // Merge headers for this route.
@@ -101,8 +110,7 @@ Object.keys(config.headers).forEach((headerKey) => {
 
   let pattern
   if (headerKey.indexOf('*') !== -1) {
-    pattern =
-      '^' + headerKey.replace(/\*\*/g, '.*').replace(/\*/g, '[^/]*') + '$'
+    pattern = routeToRegex(headerKey)
   } else {
     pattern = headerKey
   }
