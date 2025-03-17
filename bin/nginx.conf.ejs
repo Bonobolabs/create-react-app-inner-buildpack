@@ -72,7 +72,7 @@ http {
       }
     %>
     location ~ <%= pattern %> {
-      try_files $uri <%= target %>;
+      try_files $uri <%= target %> @404;
       <% if (config.headers["/**"]) { %>
         <% Object.keys(config.headers["/**"]).forEach(function(header) { %>
         more_set_headers "<%- header %>: <%- config.headers['/**'][header] %>" always;
