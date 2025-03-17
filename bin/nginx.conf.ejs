@@ -97,12 +97,14 @@ http {
         pattern = "^" + loc.replace(/\*\*/g, ".*").replace(/\*/g, "[^/]*") + "$";
     %>
     location ~ <%= pattern %> {
+      try_files $uri @404;
       <% Object.keys(config.headers[loc]).forEach(function(header) { %>
         more_set_headers "<%- header %>: <%- config.headers[loc][header] %>" always;
       <% }); %>
     }
     <%   } else { %>
     location <%= loc %> {
+      try_files $uri @404;
       <% Object.keys(config.headers[loc]).forEach(function(header) { %>
         more_set_headers "<%- header %>: <%- config.headers[loc][header] %>" always;
       <% }); %>
