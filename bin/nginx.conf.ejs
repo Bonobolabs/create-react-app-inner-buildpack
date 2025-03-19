@@ -97,6 +97,20 @@ http {
     }
     <% }); %>
 
+    <% /* Generate redirect location blocks */ %>
+    <% if (config.redirects) {
+         Object.keys(config.redirects).forEach(function(redirectPattern) {
+           let redirectConfig = config.redirects[redirectPattern];
+           let code = redirectConfig.code || 302;
+           let target = redirectConfig.target;
+    %>
+    location ~ <%= redirectPattern %> {
+      return <%= code %> <%= target %>;
+    }
+    <%     });
+       }
+    %>
+
     location @404 {
       return 404;
     }
