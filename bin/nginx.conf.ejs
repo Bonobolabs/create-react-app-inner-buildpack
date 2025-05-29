@@ -105,7 +105,8 @@ http {
            let target = redirectConfig.target;
     %>
     location ~ <%= redirectPattern %> {
-      return <%= code %> https://$host<%= target %>;
+      set $external_host $http_x_original_host;
+      return <%= code %> https://$external_host<%= target %>;
     }
     <%     });
        }
